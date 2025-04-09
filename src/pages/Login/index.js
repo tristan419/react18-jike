@@ -3,7 +3,7 @@ import { Card, Form, Input, Button, message } from 'antd'
 import logo from '@/assets/logo.png'
 import { useDispatch } from 'react-redux'
 import { fetchLogin } from '@/store/modules/user'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
   const dispatch = useDispatch()
