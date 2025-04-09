@@ -9,7 +9,7 @@ const Login = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const onFinish =async Value => {
-    console.log(Value)
+    // console.log(Value)
     //触发异步action fetchLogin
     await dispatch(fetchLogin(Value))
     //跳转到首页

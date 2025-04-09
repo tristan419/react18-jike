@@ -1,10 +1,9 @@
-body{
-  div{
-    color: blue;
-    font-size: 20px;
-    background-color: red;
-    &:hover{
-      color: green;
-    }
-  }
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+#root {
+  height: 100%;
 }
