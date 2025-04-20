@@ -5,7 +5,7 @@
 //请求拦截器//响应拦截器
 
 import axios from 'axios'
-import { getToken } from './token'
+import { getToken, removeToken } from './token'
 
 const request = axios.create({
   baseURL: 'http://geek.itheima.net/v1_0',
@@ -34,6 +34,14 @@ request.interceptors.response.use((response)=> {
   }, (error)=> {
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
+    //监控401token过期的情况
+    if(error.response.status === 401) {
+      // console.log('token过期了')
+      //清除token
+      //跳转到登录页面
+      removeToken()
+      window.location.href = '/login'
+    }
     return Promise.reject(error)
 })
 
