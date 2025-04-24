@@ -7,7 +7,8 @@ import {
     Input,
     Upload,
     Space,
-    Select
+    Select,
+    message
   } from 'antd'
   import { PlusOutlined } from '@ant-design/icons'
   import { Link } from 'react-router-dom'
@@ -45,13 +46,15 @@ import { info } from 'sass'
   
   const onFinish = (values) => {
     console.log('Success:', values)
+    //校验封面类型是否和实际图片列表数量一致
+    if (imageNum !== imageList.length) return message.error('封面图片数量和类型不一致')
     const{title,content,channel_id} = values
     const reqData ={
       title: title,
       content: content,
       cover:{
-        type: 0,
-        images: [],
+        type: imageNum,//封面模式
+        images: imageList.map(item => item.response.data.url),//封面图片
       },
       channel_id: channel_id,
     }
@@ -64,6 +67,12 @@ import { info } from 'sass'
     setImageList(info.fileList)
   }
   
+  const[imageNum, setImageNum] = useState(1)
+  //切换图片类型
+  const onTypeChange =(e)=> {
+    setImageNum(e.target.value)
+
+  }
     return (
       <div className="publish">
         <Card
@@ -104,24 +113,28 @@ import { info } from 'sass'
             </Form.Item>
 
             <Form.Item label="封面">
-            <Form.Item name="type">
+            <Form.Item name="type" onChange={onTypeChange}>
               <Radio.Group>
                 <Radio value={1}>单图</Radio>
                 <Radio value={3}>三图</Radio>
                 <Radio value={0}>无图</Radio>
               </Radio.Group>
-            </Form.Item>
+
+             
+            </Form.Item >
+            {imageNum > 0 && 
             <Upload
               name='image'
               listType="picture-card"
               showUploadList
               action={'http://geek.itheima.net/v1_0/upload'}
               onChange={onUploadChange}
+              maxCount={imageNum}
             >
               <div style={{ marginTop: 8 }}>
                 <PlusOutlined />
               </div>
-            </Upload>
+            </Upload>}
             </Form.Item>
 
             <Form.Item
