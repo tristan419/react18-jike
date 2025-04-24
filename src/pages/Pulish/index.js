@@ -23,6 +23,7 @@ import React, { useState, useEffect } from 'react'
 import  {createArticleAPI, getChannelAPI } from '@/apis/article'
 import create from '@ant-design/icons/lib/components/IconFont'
 import { info } from 'sass'
+import { useChannel } from '@/hooks/useChannel'
   
   
 
@@ -30,19 +31,20 @@ import { info } from 'sass'
   
   const Publish = () => {
 
-  //获取频道列表
-  const [channelList, setChannelList] = useState([])
+  // //获取频道列表
+  // const [channelList, setChannelList] = useState([])
 
-  useEffect(() => {
-      //1.调取接口
-      //2.调用函数
-      const getChannelList = async () => {
-          const res = await getChannelAPI()
-          // console.log(res.data.channels);
-          //3.更新状态
-          setChannelList(res.data.channels)
-      }
-      getChannelList()},[])
+  // useEffect(() => {
+  //     //1.调取接口
+  //     //2.调用函数
+  //     const getChannelList = async () => {
+  //         const res = await getChannelAPI()
+  //         // console.log(res.data.channels);
+  //         //3.更新状态
+  //         setChannelList(res.data.channels)
+  //     }
+  //     getChannelList()},[])
+  const { channelList } = useChannel()
   
   const onFinish = (values) => {
     console.log('Success:', values)
