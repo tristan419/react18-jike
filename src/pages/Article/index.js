@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select } from 'antd'
+import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select, Popconfirm } from 'antd'
 import locale from 'antd/es/date-picker/locale/zh_CN'
 
 import { Table, Tag, Space } from 'antd'
@@ -7,6 +7,8 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 // import img404 from '@/https://cdn.jsdelivr.net/npm/itheima-react/assets/error.png'
 import {Image} from 'antd'
 import { useChannel } from '@/hooks/useChannel'
+import { useEffect, useState } from 'react'
+import { deleteArticleAPI, getArticleListAPI } from '@/apis/article'
 
 
 const { Option } = Select
@@ -16,6 +18,49 @@ const Article = () => {
     const img404 = 'https://source.unsplash.com/random/80x60'
 
     const {channelList} = useChannel()
+
+    const statusList = {
+        1:<Tag color="red">草稿</Tag>,
+        2:<Tag color="green">审核通过</Tag>,
+    }
+
+    //筛选功能
+    const [reqData, setReqData] = useState({
+        status: '',
+        channel_id: '',
+        begin_pubdate: '',
+        end_pubdate: '',
+        page:1,
+        per_page: 4,
+    })
+
+    const onPageChange = (page) => {
+        // console.log('page:', page)
+        //修改参数依赖项引发数据的重新获取列表重新渲染
+        setReqData({
+            ...reqData,
+            page: page,
+        })
+    }
+
+    //获取当前的筛选数据
+    const onFinish = (values) => {
+        // console.log(values)
+        //把表单收集到数据放到参数中
+        setReqData({
+            ...reqData,
+            status: values.status,
+            channel_id: values.channel_id,
+            begin_pubdate: values.date[0].format('YYYY-MM-DD'),
+            end_pubdate: values.date[1].format('YYYY-MM-DD'),
+        })
+
+        //重新拉取文章列表
+        
+
+    }
+
+
 
     const columns = [
         {
@@ -34,7 +79,7 @@ const Article = () => {
         {
           title: '状态',
           dataIndex: 'status',
-          render: data => <Tag color="green">审核通过</Tag>
+          render: data => statusList[data]
         },
         {
           title: '发布时间',
@@ -58,12 +103,20 @@ const Article = () => {
             return (
               <Space size="middle">
                 <Button type="primary" shape="circle" icon={<EditOutlined />} />
+                <Popconfirm
+                    title="确定删除吗？"
+                    description="删除后不可恢复"
+                    onConfirm={()=>onConfirm(data.id)}
+                    okText="确定"
+                    cancelText="取消"
+                >
                 <Button
                   type="primary"
                   danger
                   shape="circle"
                   icon={<DeleteOutlined />}
                 />
+                </Popconfirm>
               </Space>
             )
           }
@@ -84,6 +137,27 @@ const Article = () => {
           title: 'wkwebview离线化加载h5资源解决方案'
         }
       ]
+
+    //删除
+    const onConfirm = async(data) => {
+        // console.log('删除了:',data)
+        await deleteArticleAPI(data)
+        setReqData({
+            ...reqData,
+        })
+    }
+
+    const [list, setlist] = useState([])
+    const [count, setCount] = useState(0)
+    useEffect(() => {
+        async function getList() {
+            const res = await getArticleListAPI(reqData)
+            // console.log(res.data.results);
+            setlist(res.data.results)
+            setCount(res.data.total_count)
+        }
+    getList()},[reqData]
+    )
   return (
     <div>
       <Card
@@ -95,8 +169,8 @@ const Article = () => {
         }
         style={{ marginBottom: 20 }}
       >
-        <Form initialValues={{ status: '' }}>
-          <Form.Item label="状态" name="status">
+        <Form initialValues={{ status: '' }} onFinish={onFinish}>
+          <Form.Item label="状态" name="status" >
             <Radio.Group>
               <Radio value={''}>全部</Radio>
               <Radio value={0}>草稿</Radio>
@@ -130,8 +204,18 @@ const Article = () => {
           </Form.Item>
         </Form>
       </Card>
-        <Card title={`根据筛选条件共查询到 ${data.length} 条结果`}>
-        <Table rowKey="id" columns={columns} dataSource={data} />
+        <Card title={`根据筛选条件共查询到 ${count} 条结果`}>
+        <Table 
+          rowKey="id" 
+          columns={columns} 
+          dataSource={list} 
+          pagination={{
+            total: count,
+            pageSize: reqData.per_page,
+            onChange: onPageChange
+          }}
+        >
+        </Table>
         </Card>
 
     </div>
