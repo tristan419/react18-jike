@@ -7,7 +7,8 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 // import img404 from '@/https://cdn.jsdelivr.net/npm/itheima-react/assets/error.png'
 import {Image} from 'antd'
 import { useChannel } from '@/hooks/useChannel'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { deleteArticleAPI, getArticleListAPI } from '@/apis/article'
 
 
@@ -60,6 +61,9 @@ const Article = () => {
 
     }
 
+    //编辑跳转
+    const navigate = useNavigate()
+
 
 
     const columns = [
@@ -102,7 +106,7 @@ const Article = () => {
           render: data => {
             return (
               <Space size="middle">
-                <Button type="primary" shape="circle" icon={<EditOutlined />} />
+                <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={() => navigate(`/Publish?id=${data.id}`)}/>
                 <Popconfirm
                     title="确定删除吗？"
                     description="删除后不可恢复"
@@ -147,6 +151,7 @@ const Article = () => {
         })
     }
 
+    
     const [list, setlist] = useState([])
     const [count, setCount] = useState(0)
     useEffect(() => {
