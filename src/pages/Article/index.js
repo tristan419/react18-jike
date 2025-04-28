@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select, Popconfirm } from 'antd'
 import locale from 'antd/es/date-picker/locale/zh_CN'
 
@@ -7,9 +7,10 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 // import img404 from '@/https://cdn.jsdelivr.net/npm/itheima-react/assets/error.png'
 import {Image} from 'antd'
 import { useChannel } from '@/hooks/useChannel'
-import { use, useEffect, useState } from 'react'
+import {  useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { deleteArticleAPI, getArticleListAPI } from '@/apis/article'
+
 
 
 const { Option } = Select
@@ -163,6 +164,8 @@ const Article = () => {
         }
     getList()},[reqData]
     )
+
+    
   return (
     <div>
       <Card

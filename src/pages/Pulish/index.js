@@ -24,6 +24,9 @@ import  {createArticleAPI, getChannelAPI } from '@/apis/article'
 import create from '@ant-design/icons/lib/components/IconFont'
 import { info } from 'sass'
 import { useChannel } from '@/hooks/useChannel'
+import { useSearchParams } from 'react-router-dom'
+import { getArticleByIdAPI } from '@/apis/article'
+import { type } from '@testing-library/user-event/dist/type'
   
   
 
@@ -45,9 +48,37 @@ import { useChannel } from '@/hooks/useChannel'
   //     }
   //     getChannelList()},[])
   const { channelList } = useChannel()
+
+  //回填数据
+  const [searchParams] = useSearchParams()
+  const articleId = searchParams.get('id')
+  // console.log(articleId)
+  const [form] = Form.useForm()
+  useEffect(() => {
+    // 通过id获取数据
+    async function getArticleById() {
+     const res = await getArticleByIdAPI(articleId)
+    //通过实例方法完成回填
+    form.setFieldsValue(
+      {...res.data,
+      type: res.data.cover.type,}
+    )
+    //回填图片列表
+    // console.log(res)
+    // console.log('res类型是：', typeof res)
+    // console.log('res内容是：', res)
+    setImageNum(res.data.cover.type)
+    setImageList(res.data.cover.images.map(url => {
+      return {url}
+      }))
+    }
+    if (articleId) {
+    getArticleById()
+    }
+  },[articleId, form])
   
   const onFinish = (values) => {
-    console.log('Success:', values)
+    // console.log('Success:', values)
     //校验封面类型是否和实际图片列表数量一致
     if (imageNum !== imageList.length) return message.error('封面图片数量和类型不一致')
     const{title,content,channel_id} = values
@@ -81,7 +112,7 @@ import { useChannel } from '@/hooks/useChannel'
           title={
             <Breadcrumb items={[
               { title: <Link to={'/'}>首页</Link> },
-              { title: '发布文章' },
+              { title: articleId ? '编辑文章' : '新增文章' },
             ]}
             />
           }
@@ -91,6 +122,7 @@ import { useChannel } from '@/hooks/useChannel'
             wrapperCol={{ span: 16 }}
             initialValues={{ type: 1 }}
             onFinish={onFinish}
+            form={form}
           >
             <Form.Item
               label="标题"
@@ -132,6 +164,7 @@ import { useChannel } from '@/hooks/useChannel'
               action={'http://geek.itheima.net/v1_0/upload'}
               onChange={onUploadChange}
               maxCount={imageNum}
+              fileList={imageList}
             >
               <div style={{ marginTop: 8 }}>
                 <PlusOutlined />
