@@ -41,3 +41,11 @@ export function getArticleByIdAPI(id) {
     method: 'GET'
   })
 }
+
+export function updateArticleAPI(data) {
+  return request({
+    url:`/mp/articles/${data.id}?draft=false`,
+    method: 'PUT',
+    data: data
+  })
+}

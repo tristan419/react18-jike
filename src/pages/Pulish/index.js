@@ -20,7 +20,7 @@ import {
 import 'react-quill-new/dist/quill.snow.css'
 import React, { useState, useEffect } from 'react'
 
-import  {createArticleAPI, getChannelAPI } from '@/apis/article'
+import  {createArticleAPI, getChannelAPI, updateArticleAPI } from '@/apis/article'
 import create from '@ant-design/icons/lib/components/IconFont'
 import { info } from 'sass'
 import { useChannel } from '@/hooks/useChannel'
@@ -87,11 +87,24 @@ import { type } from '@testing-library/user-event/dist/type'
       content: content,
       cover:{
         type: imageNum,//封面模式
-        images: imageList.map(item => item.response.data.url),//封面图片
+        //这里得做处理，看图片的接口是添加的新图还是返回的旧图
+        images:imageList.map(item => {
+          if (item.response) {
+            return item.response.data.url
+          }else{
+            return item.url
+          }
+        })
       },
       channel_id: channel_id,
     }
-    createArticleAPI(reqData)
+    //调用接口提交，这里得调用不同的接口，如果是编辑回填就得是response如果是新增就是create
+    if(articleId){
+      console.log('编辑文章', articleId)
+      updateArticleAPI({...reqData, id:articleId})
+    }else{
+      createArticleAPI(reqData)
+    }
   }
 
   //上传回调
